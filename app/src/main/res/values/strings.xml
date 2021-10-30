@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Example</string>
+    <string name="currentWeather">Current Weather</string>
+    <string name="minTemperature">Min Temperature</string>
+    <string name="maxTemperature">Max Temperature</string>
+</resources>
