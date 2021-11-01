@@ -1,0 +1,18 @@
+buildscript {
+
+    apply from: "versions.gradle"
+
+    addRepos(repositories)
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$vGradle"
+    }
+}
+
+allprojects {
+    addRepos(repositories)
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

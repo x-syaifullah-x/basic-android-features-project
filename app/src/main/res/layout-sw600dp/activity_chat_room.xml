@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/theListView"
+        android:layout_width="300dp"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/send_button"
+        tools:listitem="@layout/item_message" />
+
+    <FrameLayout
+        android:id="@+id/fragmentLocation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@+id/theListView"
+        android:background="#D3D7CF" />
+
+    <Button
+        android:id="@+id/send_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/theListView"
+        android:layout_alignParentBottom="true"
+        android:text="@string/send_button" />
+
+    <EditText
+        android:id="@+id/EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@id/receive_button"
+        android:layout_toEndOf="@+id/send_button"
+        android:autofillHints="Your Message"
+        android:hint="@string/EditText"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/receive_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/theListView"
+        android:layout_alignParentBottom="true"
+        android:text="@string/receive_button" />
+
+</RelativeLayout>

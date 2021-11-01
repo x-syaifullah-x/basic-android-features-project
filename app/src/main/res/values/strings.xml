@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Labs</string>
+    <string name="send_button">send</string>
+    <string name="EditText">edit text</string>
+    <string name="receive_button">receive</string>
+    <string name="message_here">Message Here</string>
+    <string name="id">ID=</string>
+    <string name="is_a_send_message">Is a Send Message</string>
+    <string name="hide">HIDE</string>
+</resources>
