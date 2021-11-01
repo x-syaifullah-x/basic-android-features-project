@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="currentWeather">Current\nWeather</string>
-    <string name="minTemperature">Min\nTemperature</string>
-    <string name="maxTemperature">Max\nTemperature</string>
-</resources>
