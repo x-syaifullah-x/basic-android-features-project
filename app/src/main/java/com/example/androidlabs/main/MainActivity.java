@@ -14,11 +14,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.androidlabs.BuildConfig;
 import com.example.androidlabs.R;
 import com.example.androidlabs.article.ArticleAdapter;
 import com.example.androidlabs.article.ArticleModel;
@@ -26,7 +30,9 @@ import com.example.androidlabs.data.network.GuardianAsyncTask;
 import com.example.androidlabs.data.network.response.GuardianResponse;
 import com.example.androidlabs.data.network.response.GuardianResult;
 import com.example.androidlabs.favorite.FavoriteActivity;
+import com.example.androidlabs.utils.Utils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -35,12 +41,18 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements
         GuardianAsyncTask.Callback, ArticleAdapter.ItemClick {
 
+    // add actionBarDrawerToggle
+    private ActionBarDrawerToggle actionBarDrawerToggle;
+
     private final ArrayList<ArticleModel> articleModels = new ArrayList<>();
 
     private ArrayAdapter<ArticleModel> arrayAdapter;
 
     private ProgressBar progressCircular;
 
+    /**
+     * this block changed
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,24 +61,92 @@ public class MainActivity extends AppCompatActivity implements
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         progressCircular = findViewById(R.id.progress_circular);
+        FloatingActionButton fabSearch = findViewById(R.id.fab_search);
+        ListView listView = findViewById(R.id.list_view);
 
-        toolbar.setTitle(R.string.label_home);
+        setUpToolbar(toolbar);
         setSupportActionBar(toolbar);
+        setUpNavigationDrawer(toolbar);
 
         arrayAdapter = new ArticleAdapter(this, articleModels, this);
 
-        ListView listView = findViewById(R.id.list_view);
         listView.setAdapter(arrayAdapter);
 
         new GuardianAsyncTask(this).execute();
 
-        FloatingActionButton fabSearch = findViewById(R.id.fab_search);
         fabSearch.setOnClickListener(vFab -> showDialogSearch());
     }
 
+    /**
+     * add navigation drawer
+     * change {@code {@link R.layout#activity_main}}
+     */
+    private void setUpNavigationDrawer(Toolbar toolbar) {
+        // drawer layout instance to toggle the menu icon to open
+        // drawer and back button to close drawer
+        DrawerLayout drawerLayout = findViewById(R.id.my_drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.nav_open,
+                R.string.nav_close
+        );
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            }
+            int id = item.getItemId();
+            if (id == R.id.menu_favorite) {
+                startActivity(new Intent(this, FavoriteActivity.class));
+                return true;
+            } else if (id == R.id.menu_all) {
+                new GuardianAsyncTask(this).execute();
+                return true;
+            } else if (id == R.id.menu_news) {
+                new GuardianAsyncTask(this).execute("&section=news");
+            } else if (id == R.id.menu_sport) {
+                new GuardianAsyncTask(this).execute("&section=sport");
+                return true;
+            }
+            return false;
+        });
+
+
+        // pass the Open and Close toggle for the drawer layout listener
+        // to toggle the button
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+    }
+
+    /**
+     * add toolbar
+     * change file /res/values/theme.xml {@link R.style#ToolbarSubtitleAppearance}
+     */
+    public void setUpToolbar(Toolbar toolbar) {
+        toolbar.setTitle(R.string.label_home);
+
+        // set font size subtitle toolbar
+        toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitleAppearance);
+
+        // add version number in subtitle toolbar
+        toolbar.setSubtitle(getString(R.string.version) + " " + BuildConfig.VERSION_NAME);
+    }
+
+
+    /**
+     * change code
+     * new GuardianAsyncTask(MainActivity.this).execute(query);
+     * to
+     * new GuardianAsyncTask(MainActivity.this).execute("&q=" + query);
+     * extract "Enter Your Text" to R.string.dialog_title_search
+     * extract "Please Input Text" to R.string.input_text_search
+     */
     private void showDialogSearch() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter Your Text");
+        builder.setTitle(R.string.dialog_title_search);
         View view = getLayoutInflater().inflate(R.layout.search, null);
         builder.setView(view);
         AlertDialog alertDialog = builder.create();
@@ -78,10 +158,14 @@ public class MainActivity extends AppCompatActivity implements
             if (editable != null) {
                 String query = editable.toString();
                 if (!query.isEmpty()) {
-                    new GuardianAsyncTask(MainActivity.this).execute(query);
+                    new GuardianAsyncTask(MainActivity.this).execute("&q=" + query);
                     alertDialog.dismiss();
                 } else {
-                    Toast.makeText(vSearch.getContext(), "Please Input Text", Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                            vSearch.getContext(),
+                            vSearch.getContext().getString(R.string.input_text_search),
+                            Toast.LENGTH_LONG
+                    ).show();
                 }
             }
         });
@@ -105,6 +189,9 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    /**
+     * extract string "No Result" to {@link R.string#message_no_result}
+     */
     @Override
     public void onPostExecute(@Nullable GuardianResponse response) {
         if (response != null && !response.getResults().isEmpty()) {
@@ -116,9 +203,16 @@ public class MainActivity extends AppCompatActivity implements
             }
             arrayAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(getBaseContext(), "No Result", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), getString(R.string.message_no_result), Toast.LENGTH_LONG).show();
         }
         progressCircular.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onClick(View v, ArticleModel model) {
+        Intent intent = new Intent(v.getContext(), MainDetailsActivity.class);
+        intent.putExtra(MainDetailsActivity.EXTRA_DATA_ARTICLE, model);
+        v.getContext().startActivity(intent);
     }
 
     @Override
@@ -128,19 +222,20 @@ public class MainActivity extends AppCompatActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * change code
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menu_favorite) {
-            startActivity(new Intent(this, FavoriteActivity.class));
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        } else if (item.getItemId() == R.id.menu_help) {
+            Utils.showDialogHelp(
+                    this,
+                    String.format("%s\n\n%s\n\n%s", getString(R.string.help_item_main), getString(R.string.help_search), getString(R.string.help_drawer))
+            );
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onClick(View v, ArticleModel model) {
-        Intent intent = new Intent(v.getContext(), MainDetailsActivity.class);
-        intent.putExtra(MainDetailsActivity.EXTRA_DATA_ARTICLE, model);
-        v.getContext().startActivity(intent);
     }
 }

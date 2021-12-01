@@ -19,6 +19,12 @@ public class ArticleAdapter extends ArrayAdapter<ArticleModel> {
     private final ItemClick itemClick;
 
     public interface ItemClick {
+        /**
+         * this function will be called if an item is clicked
+         *
+         * @param v     is view {@link R.layout#item_article}
+         * @param model is {@link #getItem(int)}
+         */
         void onClick(View v, ArticleModel model);
     }
 

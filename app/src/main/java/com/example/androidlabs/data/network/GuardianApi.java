@@ -21,6 +21,11 @@ public class GuardianApi {
 
     private static final String BASE_URL = "https://content.guardianapis.com";
 
+    /**
+     * @param jsonObject is data response guardianapis.
+     * @return mapping data from {@param jsonObject} to {@link GuardianResponse}
+     * @throws JSONException -- if field not match
+     */
     private static GuardianResponse jsonObjectToGuardianResponse(JSONObject jsonObject) throws JSONException {
         JSONObject jsonObjectResponse = jsonObject.getJSONObject("response");
         JSONArray jsonArrayResult = jsonObjectResponse.getJSONArray("results");
@@ -55,11 +60,22 @@ public class GuardianApi {
         );
     }
 
+    /**
+     * change code
+     * if (query !=null) stringUrl.append("&q=").append(query);
+     * to
+     * if (query !=null) stringUrl.append(query);
+     *
+     * @param query equals null the result default
+     * @throws HttpError -- if {@link HttpsURLConnection#getResponseCode()} > 300
+     * @throws HttpError -- if {@link HttpsURLConnection#getResponseCode()} < 200
+     * @return {@link GuardianApi#jsonObjectToGuardianResponse(JSONObject)}
+     */
     public static GuardianResponse search(@Nullable String query) throws Throwable {
         StringBuilder stringUrl = new StringBuilder(BASE_URL);
         stringUrl.append("/search?api-key=1fb36b70-1588-4259-b703-2570ea1fac6a");
         stringUrl.append("&page-size=50");
-        if (query !=null) stringUrl.append("&q=").append(query);
+        if (query != null) stringUrl.append(query);
 
         URL url = new URL(stringUrl.toString());
 

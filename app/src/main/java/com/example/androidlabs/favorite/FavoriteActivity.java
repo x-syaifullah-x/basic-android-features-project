@@ -3,9 +3,13 @@ package com.example.androidlabs.favorite;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -14,6 +18,7 @@ import com.example.androidlabs.R;
 import com.example.androidlabs.article.ArticleAdapter;
 import com.example.androidlabs.article.ArticleModel;
 import com.example.androidlabs.data.local.db.GuardianDatabase;
+import com.example.androidlabs.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -36,8 +41,11 @@ public class FavoriteActivity extends AppCompatActivity implements ArticleAdapte
 
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        // change code
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         articleModels.addAll(GuardianDatabase.getInstance(this).get());
         arrayAdapter = new ArticleAdapter(this, articleModels, this);
@@ -60,5 +68,27 @@ public class FavoriteActivity extends AppCompatActivity implements ArticleAdapte
             articleModels.addAll(GuardianDatabase.getInstance(this).get());
             arrayAdapter.notifyDataSetChanged();
         }
+    }
+
+    /**
+     * add created menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * add action menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_help) {
+            Utils.showDialogHelp(this, getString(R.string.help_item_favorite));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

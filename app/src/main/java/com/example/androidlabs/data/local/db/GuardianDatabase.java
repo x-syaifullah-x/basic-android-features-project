@@ -44,12 +44,23 @@ public class GuardianDatabase extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * delete data in favorite table
+     *
+     * @param id is {@link ArticleModel#getId()}
+     * @return if the return is more than 0 deletion is successful
+     */
     public boolean delete(String id) {
         return getWritableDatabase().delete(
                 TABLE_NAME, FavoriteContract.COLUMN_ID + "=?", new String[]{id}
         ) > 0;
     }
 
+    /**
+     * will retrieve all the data in the favorite table
+     *
+     * @return if the favorite table is not empty it will return all data, if it is empty it will return an empty list
+     */
     public ArrayList<ArticleModel> get() {
         ArrayList<ArticleModel> models = new ArrayList<>();
         Cursor cursor = getReadableDatabase().query(
@@ -72,6 +83,12 @@ public class GuardianDatabase extends SQLiteOpenHelper {
         return models;
     }
 
+    /**
+     * save data to table favorite
+     * if the data already exists, it will be replaced with new data
+     *
+     * @return if the return is more than 0 save is successful
+     */
     public boolean save(@NonNull ArticleModel model) {
         ContentValues values = new ContentValues();
         values.put(FavoriteContract.COLUMN_ID, model.getId());

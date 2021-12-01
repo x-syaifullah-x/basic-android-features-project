@@ -3,9 +3,13 @@ package com.example.androidlabs.favorite;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,25 +58,49 @@ public class FavoriteDetailsActivity extends AppCompatActivity {
         btnOpenInBrowser.setOnClickListener(v -> Utils.openBrowser(v, articleModel.getUrl()));
 
         FloatingActionButton fabSave = findViewById(R.id.fab_save);
+
+        // in this block there are some changes and string extraction
         fabSave.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setTitle("Are you sure want to delete from favorites?");
+            builder.setTitle(R.string.dialog_title_delete_favorite);
             builder.setCancelable(true);
-            builder.setPositiveButton("Yes", (dialog, id) -> {
+            builder.setPositiveButton(R.string.yes, (dialog, id) -> {
                 if (GuardianDatabase.getInstance(getBaseContext()).delete(articleModel.getId())) {
-                    Toast.makeText(v.getContext(), "Success Delete To Favorite", Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), v.getContext().getString(R.string.success_delete_favorite), Toast.LENGTH_LONG).show();
                     Intent intent = new Intent();
                     intent.putExtra(FavoriteActivity.KEY_IS_DELETE, true);
                     setResult(Activity.RESULT_OK, intent);
                     finish();
                 } else {
-                    Toast.makeText(v.getContext(), "Fail Delete To Favorite", Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), v.getContext().getString(R.string.fail_delete_favorite), Toast.LENGTH_LONG).show();
                 }
                 dialog.cancel();
             });
-            builder.setNegativeButton("No", (dialog, id) -> dialog.cancel());
+            builder.setNegativeButton(R.string.no, (dialog, id) -> dialog.cancel());
             AlertDialog dialog = builder.create();
             dialog.show();
         });
+    }
+
+    /**
+     * add create menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * add action menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_help) {
+            Utils.showDialogHelp(this, String.format("%s\n\n%s", getString(R.string.help_delete_message), getString(R.string.open_in_browser)));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

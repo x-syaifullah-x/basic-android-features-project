@@ -1,9 +1,13 @@
 package com.example.androidlabs.main;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,21 +52,49 @@ public class MainDetailsActivity extends AppCompatActivity {
 
         btnOpenInBrowser.setOnClickListener(v -> Utils.openBrowser(v, articleModel.getUrl()));
 
+        /*
+         * extract string to resource
+         */
         fabSave.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setTitle("Are you sure want to save to favorites");
+            builder.setTitle(R.string.dialog_save_title);
             builder.setCancelable(true);
-            builder.setPositiveButton("Yes", (dialog, id) -> {
+            builder.setPositiveButton(R.string.yes, (dialog, id) -> {
                 if (GuardianDatabase.getInstance(getBaseContext()).save(articleModel)) {
-                    Toast.makeText(v.getContext(), "Success Save To Favorite", Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), v.getContext().getString(R.string.message_success_save_to_favorite), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(v.getContext(), "Fail Save To Favorite", Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), v.getContext().getString(R.string.message_fail_save_to_favorite), Toast.LENGTH_LONG).show();
                 }
                 dialog.cancel();
             });
-            builder.setNegativeButton("No", (dialog, id) -> dialog.cancel());
+            builder.setNegativeButton(R.string.no, (dialog, id) -> dialog.cancel());
             AlertDialog dialog = builder.create();
             dialog.show();
         });
+    }
+
+    /*
+     * create menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /*
+     * action menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_help) {
+            Utils.showDialogHelp(
+                    this,
+                    String.format("%s\n\n%s", getString(R.string.help_save_message), getString(R.string.help_open_message))
+            );
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
