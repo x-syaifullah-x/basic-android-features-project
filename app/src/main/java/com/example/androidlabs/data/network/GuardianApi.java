@@ -32,6 +32,20 @@ public class GuardianApi {
         ArrayList<GuardianResult> guardianResults = new ArrayList<>(jsonArrayResult.length());
         for (int i = 0; i < jsonArrayResult.length(); i++) {
             JSONObject data = jsonArrayResult.getJSONObject(i);
+
+            String pillarId;
+            try {
+                pillarId = data.getString("pillarId");
+            } catch (Throwable e) {
+                pillarId = "";
+            }
+
+            String pillarName;
+            try {
+                pillarName = data.getString("pillarName");
+            } catch (Throwable e) {
+                pillarName = "";
+            }
             GuardianResult guardianResult = new GuardianResult(
                     data.getString("id"),
                     data.getString("type"),
@@ -42,8 +56,8 @@ public class GuardianApi {
                     data.getString("webUrl"),
                     data.getString("apiUrl"),
                     data.getBoolean("isHosted"),
-                    data.getString("pillarId"),
-                    data.getString("pillarName")
+                    pillarId,
+                    pillarName
             );
             guardianResults.add(i, guardianResult);
         }
@@ -67,9 +81,9 @@ public class GuardianApi {
      * if (query !=null) stringUrl.append(query);
      *
      * @param query equals null the result default
+     * @return {@link GuardianApi#jsonObjectToGuardianResponse(JSONObject)}
      * @throws HttpError -- if {@link HttpsURLConnection#getResponseCode()} > 300
      * @throws HttpError -- if {@link HttpsURLConnection#getResponseCode()} < 200
-     * @return {@link GuardianApi#jsonObjectToGuardianResponse(JSONObject)}
      */
     public static GuardianResponse search(@Nullable String query) throws Throwable {
         StringBuilder stringUrl = new StringBuilder(BASE_URL);

@@ -1,6 +1,7 @@
 package com.example.androidlabs.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -53,14 +54,14 @@ public class MainDetailsActivity extends AppCompatActivity {
         btnOpenInBrowser.setOnClickListener(v -> Utils.openBrowser(v, articleModel.getUrl()));
 
         /*
-         * extract string to resource
+         * code changed
          */
         fabSave.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
             builder.setTitle(R.string.dialog_save_title);
             builder.setCancelable(true);
             builder.setPositiveButton(R.string.yes, (dialog, id) -> {
-                if (GuardianDatabase.getInstance(getBaseContext()).save(articleModel)) {
+                if (GuardianDatabase.getInstance(getBaseContext()).saveToFavorite(articleModel)) {
                     Toast.makeText(v.getContext(), v.getContext().getString(R.string.message_success_save_to_favorite), Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(v.getContext(), v.getContext().getString(R.string.message_fail_save_to_favorite), Toast.LENGTH_LONG).show();
